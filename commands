@@ -1,0 +1,25 @@
+
+#Commande pour activer chip wifi
+
+rfkill unblock all
+sudo ifconfig wlan0 up
+
+
+#Commande réglage puissance émission wifi
+
+sudo iw dev wlan0 set txpower fixed 2000
+
+#Commande pour la norme
+
+sudo iw reg get 
+
+#Commande modification configuration Wifi
+
+sudo nano /etc/hostapd/hostapd.conf
+
+#Commande pour resize file save dialog : 
+
+sudo apt install dconf-editor
+
+dconf-editor -> choose org -> GTK -> setting -> file chooser ->
+window-size
