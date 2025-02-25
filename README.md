@@ -17,7 +17,7 @@ nmcli device status
 
 # 3️⃣ Set Up AP Mode ( 2.4 GHZ)
 nmcli connection delete "HERBS_AP"
-nmcli connection add type wifi ifname wlan0 con-name "HERBS_AP" autoconnect yes ssid "RaspberryPiAP"
+nmcli connection add type wifi ifname wlan0 con-name "HERBS_AP" autoconnect yes ssid "HERBS_AP"
 nmcli connection modify "HERBS_AP" 802-11-wireless.mode ap
 nmcli connection modify "HERBS_AP" 802-11-wireless.band bg
 nmcli connection modify "HERBS_AP" 802-11-wireless.channel 6
