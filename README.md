@@ -16,15 +16,15 @@ sudo systemctl restart NetworkManager
 nmcli device status
 
 # 3️⃣ Set Up AP Mode ( 2.4 GHZ)
-nmcli connection delete "RaspberryPiAP"
-nmcli connection add type wifi ifname wlan0 con-name "RaspberryPiAP" autoconnect yes ssid "RaspberryPiAP"
-nmcli connection modify "RaspberryPiAP" 802-11-wireless.mode ap
-nmcli connection modify "RaspberryPiAP" 802-11-wireless.band bg
-nmcli connection modify "RaspberryPiAP" 802-11-wireless.channel 6
-nmcli connection modify "RaspberryPiAP" ipv4.addresses 192.168.1.1/24
-nmcli connection modify "RaspberryPiAP" ipv4.method manual
-nmcli connection modify "RaspberryPiAP" ipv6.method ignore
-nmcli connection up "RaspberryPiAP"
+nmcli connection delete "HERBS_AP"
+nmcli connection add type wifi ifname wlan0 con-name "HERBS_AP" autoconnect yes ssid "RaspberryPiAP"
+nmcli connection modify "HERBS_AP" 802-11-wireless.mode ap
+nmcli connection modify "HERBS_AP" 802-11-wireless.band bg
+nmcli connection modify "HERBS_AP" 802-11-wireless.channel 6
+nmcli connection modify "HERBS_AP" ipv4.addresses 192.168.1.1/24
+nmcli connection modify "HERBS_AP" ipv4.method manual
+nmcli connection modify "HERBS_AP" ipv6.method ignore
+nmcli connection up "HERBS_AP"
 
 # 4️⃣ Scan for Wi-Fi Networks and Get RSSI
 nmcli device wifi list
