@@ -1,0 +1,98 @@
+main program : 
+
+from Key import *
+from Keypad import *
+
+# Define GPIO pins for rows and columns
+ROWS = [20, 6, 19, 26]  # Adjust based on your wiring
+COLS = [13, 12, 16]  # Adjust based on your wiring
+
+# Define the keypad layout (3x4 Keypad)
+KEYMAP = [
+    ["1", "2", "3"],
+    ["4", "5", "6"],
+    ["7", "8", "9"],
+    ["*", "0", "#"]
+]
+
+# Create Keypad instance
+keypad = Keypad(KEYMAP, ROWS, COLS)
+
+# Callback function to handle key events
+def print_key(key):
+    print(f"Key Pressed: {key}")
+
+# Register event listener
+keypad.addEventListener(print_key)
+
+# Start listening for key presses
+print("Listening for key presses... (Press Ctrl+C to exit)")
+keypad.listenForKeyPresses()
+
+
+Keybad class : 
+
+import RPi.GPIO as GPIO
+import time
+
+class Keypad:
+    def __init__(self, keymap, row_pins, col_pins, hold_time=500):
+        self.keymap = keymap
+        self.row_pins = row_pins
+        self.col_pins = col_pins
+        self.hold_time = hold_time / 1000.0  # Convert ms to seconds
+        self.keypadEventListener = None  # Event callback function
+
+        # Initialize GPIO
+        GPIO.setmode(GPIO.BCM)
+        for row in self.row_pins:
+            GPIO.setup(row, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Rows as input
+        for col in self.col_pins:
+            GPIO.setup(col, GPIO.OUT)  # Columns as output
+
+    def scanKeys(self):
+        pressed_keys = []
+
+        for col_idx, col in enumerate(self.col_pins):
+            GPIO.output(col, GPIO.LOW)  # Activate one column
+            time.sleep(0.01)  # Small stability delay
+
+            for row_idx, row in enumerate(self.row_pins):
+                if GPIO.input(row) == GPIO.LOW:  # Key is pressed
+                    key_char = self.keymap[row_idx][col_idx]
+                    pressed_keys.append(key_char)
+                    # ?? **Wait until the key is fully released (PULL-UP detected)**
+                    while GPIO.input(row) == GPIO.LOW:
+                        pass  # Do nothing, just wait until it's released
+
+            GPIO.output(col, GPIO.HIGH)  # Reset column
+        return pressed_keys
+
+    def getKey(self):
+        """ Returns the first pressed key (if any), else None """
+        keys = self.scanKeys()
+        return keys[0] if keys else None
+
+    def waitForKey(self):
+        """ Block execution until a key is pressed and fully released """
+        while True:
+            key = self.getKey()
+            if key:
+                return key
+            time.sleep(0.1)  # Prevent unnecessary CPU usage
+
+    def addEventListener(self, callback):
+        """ Set the callback function to handle key events """
+        self.keypadEventListener = callback
+
+    def listenForKeyPresses(self):
+        """ Continuously check for key presses and trigger callback """
+        try:
+            while True:
+                keys = self.scanKeys()
+                if keys and self.keypadEventListener:
+                    for key in keys:
+                        self.keypadEventListener(key)
+        except KeyboardInterrupt:
+            print("\n[INFO] Exiting safely...")
+            GPIO.cleanup()  # Cleanup GPIO on exit
