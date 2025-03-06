@@ -1,3 +1,8 @@
 *Run this command at the very start of it *
 
 sudo chmod -R 777 /mnt/nvme
+
+sudo apt install dconf-editor
+
+dconf-editor -> choose org -> GTK -> setting -> file chooser ->
+window-size
