@@ -1,28 +1,2 @@
 
 # Indoor Localization Experiment Guide
-
-This folder contains all materials and details used for experiments regarding **waveforms, modulation techniques, and other electromagnetic wave aspects** in the context of **indoor localization**.
-
-## 📌 General Guide to Replicate the Experiment Configuration
-
-### ✅ **1. Full Replication (Exact Configuration)**
-If you want to replicate the **exact same setup**, follow these steps:
-
-- Download the **pre-configured Raspberry Pi images** from the `images/` folder:
-  - **`pi4_image.img`** → for Raspberry Pi 4  
-  - **`pi5_image.img`** → for Raspberry Pi 5  
-
-- Flash the image to an SD card using a tool like **Raspberry Pi Imager** or **balenaEtcher**.
-- Modify the **network configuration** (IP addresses, DHCP settings) to fit your own network.
-
----
-
-### ✅ **2. Step-by-Step Configuration Guide**
-If you're interested in configuring each component manually, follow the **sections below**:
-
-### 🔹 2.1 Connecting a Raspberry Pi to Your Network (Enterprise, School, etc.)
-> 📷 *[Insert Image Here]*  
-How to connect a Raspberry Pi to a **secure network** (with WPA2 Enterprise, School WiFi, etc.).
-
-```bash
-sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
