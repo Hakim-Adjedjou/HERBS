@@ -1,4 +1,173 @@
-  GNU nano 5.4                                                                                                                                                                                                                                                          start_capture.py                                                                                                                                                                                                                                                                    
+  GNU nano 5.4                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         start_capture.py                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  import subprocess
+import re
+import os
+import RPi.GPIO as GPIO
+import time
+from grove_rgb_lcd import *
+from datetime import datetime
+from scapy.all import PcapReader, PcapWriter, UDP
+
+# === CONFIGURATION ===
+source_macs = {
+    "d8:3a:dd:b1:82:f4",
+    "d8:3a:dd:b7:36:66",
+    "d8:3a:dd:af:ef:99",
+    "d8:3a:dd:d1:ff:11",
+    "d8:3a:dd:93:cc:8e",
+    "d8:3a:dd:93:e9:88",
+}
+
+packet_quota = 500
+total_written = 0
+current_position = (0, 0)
+writer = None
+measurement_started = False
+running = True
+measurement_paused=False
+# === GPIO Keypad Configuration ===
+ROW_PINS = [20, 5, 19, 26]
+COL_PINS = [13, 12, 16]
+GPIO.setmode(GPIO.BCM)
+for col in COL_PINS:
+    GPIO.setup(col, GPIO.OUT)
+    GPIO.output(col, GPIO.LOW)
+for row in ROW_PINS:
+    GPIO.setup(row, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+# === KEY SCAN ===
+def get_key():
+    while True:
+        for col_index, col_pin in enumerate(COL_PINS):
+            GPIO.output(col_pin, GPIO.LOW)
+            for other_col in COL_PINS:
+                if other_col != col_pin:
+                    GPIO.output(other_col, GPIO.HIGH)
+            for row_index, row_pin in enumerate(ROW_PINS):
+                if GPIO.input(row_pin) == GPIO.LOW:
+                    time.sleep(0.02)
+                    while GPIO.input(row_pin) == GPIO.LOW:
+                        time.sleep(0.01)
+                    for c in COL_PINS:
+                        GPIO.output(c, GPIO.LOW)
+                    key_map = [
+                        ['1','2','3'],
+                        ['4','5','6'],
+                        ['7','8','9'],
+                        ['*','0','#']
+                    ]
+                    return key_map[row_index][col_index]
+        time.sleep(0.01)
+
+def _read_number(label, max_digits, min_val, max_val):
+    num_str = ""
+    setText(f"{label}: _\n" + " " * 16)
+    while True:
+        key = get_key()
+        if key.isdigit():
+            if len(num_str) < max_digits:
+                num_str += key
+                setText(f"{label}: {num_str}_\n" + " " * 16)
+            else:
+                setText(f"  Max {max_digits} digits!\n Try again")
+                time.sleep(1)
+                num_str = ""
+                setText(f"{label}: _\n" + " " * 16)
+        elif key == '*':
+            if num_str == "":
+                setText("  No input!  \n Enter number")
+                time.sleep(1)
+                num_str = ""
+                setText(f"{label}: _\n" + " " * 16)
+                continue
+            value = int(num_str)
+            if value < min_val or value > max_val:
+                setText(f"Out of range!\n({min_val}-{max_val})")
+                time.sleep(1)
+                num_str = ""
+                setText(f"{label}: _\n" + " " * 16)
+                continue
+            else:
+                return value
+        elif key == '#':
+            setText(" Entry cancelled.\nReturning..")
+            time.sleep(1)
+            return None
+        else:
+            continue
+
+def set_position():
+    global current_position
+    x = _read_number("X", 2, 0, 99)
+    if x is None: return
+    y = _read_number("Y", 2, 0, 99)
+    if y is None: return
+    current_position = (x, y)
+    setText(f"X:{x}, Y:{y}\nReady to start")
+    time.sleep(2)
+    setText("Press # and \n choose start")
+
+def start_measurement():
+    global measurement_paused
+    if !measurement_paused :
+      global writer, measurement_started, output_file, total_written
+      timestamp_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+      x, y = current_position
+      output_file = f"/mnt/ssd/captures_bw20_canal40_6AP_wifi_5GHZ/CSI_pos_{x}_{y}_Date_{timestamp_str}.pcap"
+      writer = PcapWriter(output_file, append=False, sync=True)
+      total_written = 0
+      measurement_started = True
+      setText("Measurement\n  started")
+      time.sleep(2)
+    else :
+      measurement_started=True
+      measurement_paused=False
+      setText("Continue \n measurements")
+      time.sleep(2)
+
+def pause_measurement():
+    global measurement_started
+    measurement_started = False
+    measurement_paused= True
+    setText("Measurement\n  paused")
+    time.sleep(2)
+
+def stop_program():
+    global running
+    running = False
+    setText("Program exiting\n  please wait")
+    time.sleep(2)
+
+def config_menu():
+    setText("* Config Menu *\n")
+    time.sleep(2)
+    setText("1:start,2:pause\n 3:POS, 4:exit")
+    while True:
+        choice = get_key()
+        if choice == '1':
+            start_measurement()
+            break
+        elif choice == '2':
+            pause_measurement()
+            break
+        elif choice == '3':
+            set_position()
+            break
+        elif choice == '4':
+            stop_program()
+            break
+        else:
+            setText("Invalid choice\ntry again")
+            time.sleep(1)
+            setText("1:S 2:P 3:POS 4:X")
+
+def on_hash_pressed(channel):
+    GPIO.remove_event_detect(26)
+    time.sleep(0.05)
+    key = get_key()
+    if key == "#":
+        config_menu()
+    GPIO.add_event_detect(26, GPIO.FALLING, callback=on_hash_pressed, bouncetime=200)
+
 # === UTILITIES ===
 def run(command, capture_output=False):
     #print(f"[>] Running: {command}")
@@ -8,7 +177,7 @@ def run(command, capture_output=False):
 
 def setup_monitor_interface():
     #print("\n🔧 Initial CSI setup (one-time)...")
-    csi_key = run("mcp -C 1 -N 1 -c 40/80", capture_output=True).strip()
+    csi_key = run("mcp -C 1 -N 1 -c 40/20", capture_output=True).strip()
     if not csi_key or len(csi_key) < 10:
         raise ValueError("❌ Invalid or missing key from MCP.")
     run("sudo ifconfig wlan0 down")
@@ -77,7 +246,5 @@ if __name__ == "__main__":
         if writer:
             writer.close()
         setText("Program stopped\nBye!")
-
-
 
 
