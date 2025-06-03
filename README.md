@@ -112,12 +112,33 @@ sudo ip link set wlan0 up
 
 ✅ 9. Enable and Start Services
 
+sudo systemctl enable systemd-networkd
+sudo systemctl start systemd-networkd
+sudo nano /etc/systemd/network/wlan0.network
+
+copy this : 
+[Match]
+Name=wlan0
+
+[Network]
+Address=192.168.1.1/24
+
+sudo nano /etc/systemd/network/eth0.network
+cpoy this : 
+[Match]
+Name=eth0
+
+[Network]
+Address=163.173.96.166/22
+Gateway=163.173.96.2
+DNS=163.173.128.6
+
+
+sudo rm /etc/dhcpcd.conf
+
 sudo systemctl unmask hostapd
 sudo systemctl enable hostapd
 sudo systemctl enable dnsmasq
-sudo systemctl restart dhcpcd
-sudo systemctl start dnsmasq
-sudo systemctl start hostapd
 
 ✅ 10. Reboot and Verify
 
@@ -137,3 +158,23 @@ Bandwidth: 40 MHz
 
 SSID: HERBS_AP1 broadcasting
 
+
+
+
+if you want 80 Mhz DO THIS in hotspad file : 
+
+
+
+interface=wlan0
+driver=nl80211
+ssid=HERBS_AP1
+hw_mode=a
+channel=36
+ieee80211n=1
+ieee80211ac=1
+vht_capab=[SHORT-GI-80]
+vht_oper_chwidth=1
+vht_oper_centr_freq_seg0_idx=42
+ht_capab=[HT40+]
+wmm_enabled=1
+auth_algs=1
