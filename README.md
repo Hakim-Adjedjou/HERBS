@@ -34,3 +34,106 @@ watch -n 2 nmcli device wifi list
 if 5 GHz just change these : 
 nmcli connection modify "RaspberryPiAP" 802-11-wireless.band a
 nmcli connection modify "RaspberryPiAP" 802-11-wireless.channel 36
+
+
+###################################################################### ANOTHER METHOD IF YOU WANT TO CHANGE THE BANDWIDTH ###########################################################
+
+
+✅ 1. Install Required Packages
+
+sudo apt update
+sudo apt install hostapd dnsmasq
+
+✅ 2. Stop Conflicting Services
+
+sudo systemctl stop wpa_supplicant
+sudo systemctl disable wpa_supplicant
+sudo systemctl stop NetworkManager
+sudo systemctl disable NetworkManager
+sudo killall wpa_supplicant
+sudo killall dhclient
+sudo rfkill unblock wifi
+
+✅ 3. Set the Regulatory Domain (e.g. France)
+
+sudo iw reg set FR
+To make it permanent:
+echo 'REGDOMAIN=FR' | sudo tee /etc/default/crda
+
+✅ 4. Create or Edit /etc/hostapd/hostapd.conf
+
+sudo nano /etc/hostapd/hostapd.conf
+
+Paste this:
+
+interface=wlan0
+driver=nl80211
+ssid=HERBS_AP1
+hw_mode=a
+channel=36
+ieee80211n=1
+ht_capab=[HT40+]
+wmm_enabled=1
+auth_algs=1
+ignore_broadcast_ssid=0
+#noscan=1
+
+
+✅ 5. Point hostapd to Config File
+
+sudo nano /etc/default/hostapd
+Set:
+
+DAEMON_CONF="/etc/hostapd/hostapd.conf"
+
+✅ 6. Set a Static IP for wlan0 (Create /etc/dhcpcd.conf if needed)
+
+sudo nano /etc/dhcpcd.conf
+Add:
+
+interface wlan0
+    static ip_address=192.168.1.1/24
+    nohook wpa_supplicant
+    
+✅ 7. Configure DHCP Server (dnsmasq)
+
+sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.orig
+sudo nano /etc/dnsmasq.conf
+Add:
+
+interface=wlan0
+dhcp-range=192.168.1.10,192.168.1.100,24h
+
+✅ 8. Bring wlan0 into AP Mode
+
+sudo ip link set wlan0 down
+sudo iw dev wlan0 set type __ap
+sudo ip link set wlan0 up
+
+✅ 9. Enable and Start Services
+
+sudo systemctl unmask hostapd
+sudo systemctl enable hostapd
+sudo systemctl enable dnsmasq
+sudo systemctl restart dhcpcd
+sudo systemctl start dnsmasq
+sudo systemctl start hostapd
+
+✅ 10. Reboot and Verify
+
+sudo reboot
+After reboot, check:
+
+sudo systemctl status hostapd
+iw dev wlan0 info
+
+You should see:
+
+AP mode
+
+Channel: 36
+
+Bandwidth: 40 MHz
+
+SSID: HERBS_AP1 broadcasting
+
