@@ -1,0 +1,11 @@
+to disable the auto execution of the code : 
+
+sudo systemctl disable start_capture.service
+sudo systemctl stop start_capture.service
+
+
+
+
+to enable it again : 
+sudo systemctl enable start_capture.service
+sudo systemctl start start_capture.service
