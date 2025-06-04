@@ -140,6 +140,7 @@ def start_measurement():
     base_folder="~/measurements_CSI/measurements_canal40_bw80_VHT_5GHz_wifi/lab"
     #base_folder="~/measurements_CSI/measurements_canal40_bw80_VHT_5GHz_wifi/grenoble"
 
+    date_folder = os.path.join(base_folder, date_str)
 
     # Create the dated folder if it doesn't exist
     os.makedirs(date_folder, exist_ok=True)
