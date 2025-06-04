@@ -124,21 +124,21 @@ def start_measurement():
     timestamp_str = timestamp.strftime("%Y-%m-%d_%H-%M-%S")
     x, y = current_position
 
-    #base folder="~/measurements_CSI/measurements_canal40_bw20_HT_5GHz_wifi/museum"
-    #base folder="~/measurements_CSI/measurements_canal40_bw20_HT_5GHz_wifi/lab"
-    #base folder="~/measurements_CSI/measurements_canal40_bw20_HT_5GHz_wifi/grenoble"
+    #base_folder="~/measurements_CSI/measurements_canal40_bw20_HT_5GHz_wifi/museum"
+    #base_folder="~/measurements_CSI/measurements_canal40_bw20_HT_5GHz_wifi/lab"
+    #base_folder="~/measurements_CSI/measurements_canal40_bw20_HT_5GHz_wifi/grenoble"
 
-    #base folder="~/measurements_CSI/measurements_canal40_bw20_VHT_5GHz_wifi/museum"
-    #base folder="~/measurements_CSI/measurements_canal40_bw20_VHT_5GHz_wifi/lab"
-    #base folder="~/measurements_CSI/measurements_canal40_bw20_VHT_5GHz_wifi/grenoble"
+    #base_folder="~/measurements_CSI/measurements_canal40_bw20_VHT_5GHz_wifi/museum"
+    #base_folder="~/measurements_CSI/measurements_canal40_bw20_VHT_5GHz_wifi/lab"
+    #base_folder="~/measurements_CSI/measurements_canal40_bw20_VHT_5GHz_wifi/grenoble"
 
-    #base folder="~/measurements_CSI/measurements_canal40_bw20_nmcli_code_AP_5GHz_wifi/museum"
-    #base folder="~/measurements_CSI/measurements_canal40_bw20_nmcli_code_AP_5GHz_wifi/lab"
-    #base folder="~/measurements_CSI/measurements_canal40_bw20_nmcli_code_AP_5GHz_wifi/grenoble"
+    #base_folder="~/measurements_CSI/measurements_canal40_bw20_nmcli_code_AP_5GHz_wifi/museum"
+    #base_folder="~/measurements_CSI/measurements_canal40_bw20_nmcli_code_AP_5GHz_wifi/lab"
+    #base_folder="~/measurements_CSI/measurements_canal40_bw20_nmcli_code_AP_5GHz_wifi/grenoble"
 
-    #base folder="~/measurements_CSI/measurements_canal40_bw80_VHT_5GHz_wifi/museum"
-    base folder="~/measurements_CSI/measurements_canal40_bw80_VHT_5GHz_wifi/lab"
-    #base folder="~/measurements_CSI/measurements_canal40_bw80_VHT_5GHz_wifi/grenoble"
+    #base_folder="~/measurements_CSI/measurements_canal40_bw80_VHT_5GHz_wifi/museum"
+    base_folder="~/measurements_CSI/measurements_canal40_bw80_VHT_5GHz_wifi/lab"
+    #base_folder="~/measurements_CSI/measurements_canal40_bw80_VHT_5GHz_wifi/grenoble"
 
 
     # Create the dated folder if it doesn't exist
