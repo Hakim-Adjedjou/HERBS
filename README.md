@@ -82,20 +82,13 @@ ignore_broadcast_ssid=0
 ✅ 5. Point hostapd to Config File
 
 sudo nano /etc/default/hostapd
+
 Set:
 
 DAEMON_CONF="/etc/hostapd/hostapd.conf"
 
-✅ 6. Set a Static IP for wlan0 (Create /etc/dhcpcd.conf if needed)
-
-sudo nano /etc/dhcpcd.conf
-Add:
-
-interface wlan0
-    static ip_address=192.168.1.1/24
-    nohook wpa_supplicant
     
-✅ 7. Configure DHCP Server (dnsmasq)
+✅ 6. Configure DHCP Server (dnsmasq)
 
 sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.orig
 sudo nano /etc/dnsmasq.conf
@@ -104,13 +97,13 @@ Add:
 interface=wlan0
 dhcp-range=192.168.1.10,192.168.1.100,24h
 
-✅ 8. Bring wlan0 into AP Mode
+✅ 7. Bring wlan0 into AP Mode
 
 sudo ip link set wlan0 down
 sudo iw dev wlan0 set type __ap
 sudo ip link set wlan0 up
 
-✅ 9. Enable and Start Services
+✅ 8. Enable and Start Services
 
 sudo systemctl enable systemd-networkd
 sudo systemctl start systemd-networkd
@@ -123,7 +116,10 @@ Name=wlan0
 [Network]
 Address=192.168.1.1/24
 
+
+
 sudo nano /etc/systemd/network/eth0.network
+
 cpoy this : 
 [Match]
 Name=eth0
@@ -134,13 +130,11 @@ Gateway=163.173.96.2
 DNS=163.173.128.6
 
 
-sudo rm /etc/dhcpcd.conf
-
 sudo systemctl unmask hostapd
 sudo systemctl enable hostapd
 sudo systemctl enable dnsmasq
 
-✅ 10. Reboot and Verify
+✅ 9. Reboot and Verify
 
 sudo reboot
 After reboot, check:
@@ -159,11 +153,7 @@ Bandwidth: 40 MHz
 SSID: HERBS_AP1 broadcasting
 
 
-
-
 if you want 80 Mhz DO THIS in hotspad file : 
-
-
 
 interface=wlan0
 driver=nl80211
