@@ -1,4 +1,4 @@
-  GNU nano 5.4                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         start_capture.py                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  import subprocess
+GNU nano 5.4                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            start_capture.py                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      import subprocess
 import re
 import os
 import RPi.GPIO as GPIO
@@ -15,6 +15,9 @@ source_macs = {
     "d8:3a:dd:d1:ff:11",
     "d8:3a:dd:93:cc:8e",
     "d8:3a:dd:93:e9:88",
+    "d8:3a:dd:fc:f7:a7",
+    "d8:3a:dd:fc:f6:d3",
+    "2c:cf:67:22:85:6e",
 }
 
 packet_quota = 500
@@ -97,9 +100,9 @@ def _read_number(label, max_digits, min_val, max_val):
 
 def set_position():
     global current_position
-    x = _read_number("X", 3, 0, 999)
+    x = _read_number("X", 4, 0, 9999)
     if x is None: return
-    y = _read_number("Y", 3, 0, 999)
+    y = _read_number("Y", 4, 0, 9999)
     if y is None: return
     current_position = (x, y)
     setText(f"X:{x}, Y:{y}\nReady to start")
@@ -121,8 +124,22 @@ def start_measurement():
     timestamp_str = timestamp.strftime("%Y-%m-%d_%H-%M-%S")
     x, y = current_position
 
-    base_folder = "/mnt/ssd/captures_bw20_canal40_6AP_wifi_5GHZ"
-    date_folder = os.path.join(base_folder, date_str)
+    #base folder="~/measurements_CSI/measurements_canal40_bw20_HT_5GHz_wifi/museum"
+    #base folder="~/measurements_CSI/measurements_canal40_bw20_HT_5GHz_wifi/lab"
+    #base folder="~/measurements_CSI/measurements_canal40_bw20_HT_5GHz_wifi/grenoble"
+
+    #base folder="~/measurements_CSI/measurements_canal40_bw20_VHT_5GHz_wifi/museum"
+    #base folder="~/measurements_CSI/measurements_canal40_bw20_VHT_5GHz_wifi/lab"
+    #base folder="~/measurements_CSI/measurements_canal40_bw20_VHT_5GHz_wifi/grenoble"
+
+    #base folder="~/measurements_CSI/measurements_canal40_bw20_nmcli_code_AP_5GHz_wifi/museum"
+    #base folder="~/measurements_CSI/measurements_canal40_bw20_nmcli_code_AP_5GHz_wifi/lab"
+    #base folder="~/measurements_CSI/measurements_canal40_bw20_nmcli_code_AP_5GHz_wifi/grenoble"
+
+    #base folder="~/measurements_CSI/measurements_canal40_bw80_VHT_5GHz_wifi/museum"
+    base folder="~/measurements_CSI/measurements_canal40_bw80_VHT_5GHz_wifi/lab"
+    #base folder="~/measurements_CSI/measurements_canal40_bw80_VHT_5GHz_wifi/grenoble"
+
 
     # Create the dated folder if it doesn't exist
     os.makedirs(date_folder, exist_ok=True)
@@ -215,6 +232,26 @@ def capture_new_pcap():
     ])
     return temp_capture_file
 
+#======= no filter ==============
+#def filter_pcap(pcap_path):
+#    global total_written, writer
+#    match_count = 0
+#    with PcapReader(pcap_path) as reader:
+#        for packet in reader:
+#            if not packet.haslayer(UDP):
+#                continue
+#            payload = bytes(packet[UDP].payload)
+#            if len(payload) < 10 or payload[0:2] != b'\x11\x11':
+#                continue
+#            writer.write(packet)
+#            total_written += 1
+#            match_count += 1
+#            if total_written >= packet_quota:
+#                return match_count
+#    return match_count
+
+
+#======== with filter
 def filter_pcap(pcap_path):
     global total_written, writer
     match_count = 0
@@ -236,7 +273,6 @@ def filter_pcap(pcap_path):
                 if total_written >= packet_quota:
                     return match_count
     return match_count
-
 # === MAIN LOOP ===
 if __name__ == "__main__":
     setup_monitor_interface()
@@ -265,3 +301,12 @@ if __name__ == "__main__":
         if writer:
             writer.close()
         setText("Program stopped\nBye!")
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                       
